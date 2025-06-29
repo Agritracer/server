@@ -128,7 +128,7 @@ const createProcessor = async (req: Request, res: Response) => {
     harvest: harvest._id,
   });
 
-  const qrcode = await generateQR(traceabilityInfo._id.valueOf().toString());
+  const qrcode = await generateQR(processor._id.valueOf().toString());
   processor.info = traceabilityInfo._id;
   processor.qr_code = qrcode;
   await processor.save();
@@ -252,7 +252,8 @@ const updateProcessor = async (req: Request, res: Response) => {
 const deleteProcessor = async (req: Request, res: Response) => {
   const { id: processorId } = req.params;
   const UseID = req.body.UseID;
-  const processor = await Processor.findOne({ _id: processorId });
+  const processor = await Processor.findOne({ _id: processorId })
+  postData(processor, 'delete', UseID.userId);
   if (!processor) {
     throw new CustomError.NotFoundError(`No processor with id ${processor}`);
   }
@@ -262,7 +263,7 @@ const deleteProcessor = async (req: Request, res: Response) => {
     remove(processor.images);
   }
   res.status(StatusCodes.OK).json({ msg: 'Success! Processor removed.' });
-  postData(processorId, 'delete', UseID.userId);
+
 };
 
 const uploadImages = async (req: Request, res: Response) => {
