@@ -4,6 +4,8 @@ import CustomError from '../errors';
 import { Disease } from '../models';
 import { remove, upload } from './cloudinary';
 
+
+
 const getAllDiseases = async (req: Request, res: Response) => {
   const { searchQuery, sort } = req.query;
   const queryObject: any = {};

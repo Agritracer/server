@@ -40,6 +40,7 @@ import {
 
 //middlewares
 import errorHandlerMiddleware from './middlewares/error-handler';
+import postData from './middlewares/postData';
 
 // services
 import HerdMonitoringService from './services/herd-monitoring-service';
@@ -82,6 +83,24 @@ app.use('/api/v1/distributors', distributorRouter);
 app.use('/api/v1/qrcode', qrCodeRouter);
 app.use('/api/v1/notifications', noticationRouter);
 
+const getCurrentUser = (req: any) => {
+  if (req.user) {
+    return {
+      user: req.user,
+    };
+  }
+};
+
+app.use('/api/v1/test', async (req, res, next) => {
+  const data = {
+    haha: 'qq',
+    hsa: 'sbdad',
+    user: await getCurrentUser(req),
+  };
+  console.log(data);
+  // postData(data, 'insert');
+});
+
 app.use(errorHandlerMiddleware);
 
 const herdMonitoringService = new HerdMonitoringService();
@@ -98,8 +117,6 @@ cron.schedule('0 0 * * *', async () => {
 
 const start = async () => {
   const serverGlobal = ServerGlobal.getInstance();
-  // const server2 = ServerGlobal.getInstance();
-  // console.log('compare::', serverGlobal === server2);
   try {
     await serverGlobal.connectDB(process.env.DB_URI);
     app.listen(port, () => {
@@ -109,7 +126,6 @@ const start = async () => {
     serverGlobal.logger.error(`Failed to start server: ${error}`);
   }
 };
-
 start();
 
 export default app;

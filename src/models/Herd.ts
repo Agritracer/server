@@ -1,5 +1,5 @@
 import { Schema, model, Types } from 'mongoose';
-import { Observer } from 'services/harvest-service';
+import { Observer } from '../services/harvest-service';
 import { Notification, User } from './';
 
 interface IHerd {
@@ -133,8 +133,8 @@ HerdSchema.methods.notifyObservers = async function (): Promise<void> {
 HerdSchema.methods.checkHarvestStatus = async function (): Promise<void> {
   const age = new Date().valueOf() - this.start_date;
   const six_month = 1000 * 60 * 60 * 24 * 30 * 6;
-  // if (this.status === 'Chưa thu hoạch' && !this.notified && age > six_month) {
-  if (this.status === 'Chưa thu hoạch') {
+  if (this.status === 'Chưa thu hoạch' && !this.notified && age > six_month) {
+    // if (this.status === 'Chưa thu hoạch') {
     this.notified = true;
     await this.notifyObservers();
     this.save();

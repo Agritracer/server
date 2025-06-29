@@ -10,6 +10,7 @@ import {
 } from '../models';
 import { remove, upload } from './cloudinary';
 import generateQR from '../utils/generateQR';
+import postData from '../middlewares/postData';
 
 const getAllProcessors = async (req: Request, res: Response) => {
   const { searchQuery, sort } = req.query;
@@ -48,7 +49,7 @@ const getAllProducts = async (req: Request, res: Response) => {
   const products = await Processor.find({})
     .populate('product_info')
     .select(
-      'price currency_unit net_weight unit dte production_date images qr_code'
+      'price currency_unit net_weight unit dte production_date images qr_code',
     );
 
   res.status(StatusCodes.OK).json({ products, count: products.length });
@@ -56,6 +57,7 @@ const getAllProducts = async (req: Request, res: Response) => {
 
 const createProcessor = async (req: Request, res: Response) => {
   const {
+    UseID,
     price,
     currency_unit,
     net_weight,
@@ -65,16 +67,17 @@ const createProcessor = async (req: Request, res: Response) => {
     description,
     location,
     quantity,
+
   } = req.body;
 
   if (!req.body.harvest) {
-    throw new CustomError.BadRequestError("Please provide harvest's id");
+    throw new CustomError.BadRequestError('Please provide harvest\'s id');
   }
 
   const harvest = await Harvest.findOne({ _id: req.body.harvest });
   if (!harvest) {
     throw new CustomError.BadRequestError(
-      `No harvest with id ${req.body.harvest}`
+      `No harvest with id ${req.body.harvest}`,
     );
   }
 
@@ -87,7 +90,7 @@ const createProcessor = async (req: Request, res: Response) => {
   });
   if (!product_info) {
     throw new CustomError.BadRequestError(
-      `No product info with id ${req.body.product_info}`
+      `No product info with id ${req.body.product_info}`,
     );
   }
 
@@ -115,7 +118,7 @@ const createProcessor = async (req: Request, res: Response) => {
   const herd = await Herd.findOne({ _id: harvest.herd });
   if (!herd) {
     throw new CustomError.BadRequestError(
-      'The infomation of herd does not exists'
+      'The infomation of herd does not exists',
     );
   }
 
@@ -131,6 +134,8 @@ const createProcessor = async (req: Request, res: Response) => {
   await processor.save();
 
   res.status(StatusCodes.CREATED).json({ processor });
+  console.log('' + UseID.userId);
+  postData(processor, 'insert', UseID.userId);
 };
 
 const getProcessor = async (req: Request, res: Response) => {
@@ -153,6 +158,7 @@ const getProcessor = async (req: Request, res: Response) => {
 const updateProcessor = async (req: Request, res: Response) => {
   const { id: processorId } = req.params;
   const {
+    UseID,
     price,
     currency_unit,
     net_weight,
@@ -231,7 +237,7 @@ const updateProcessor = async (req: Request, res: Response) => {
     const newProductInfo = await ProductInfo.findOne({ _id: harvest });
     if (!newProductInfo) {
       throw new CustomError.BadRequestError(
-        `No product info with id ${product_info}`
+        `No product info with id ${product_info}`,
       );
     }
 
@@ -240,11 +246,12 @@ const updateProcessor = async (req: Request, res: Response) => {
 
   await processor.save();
   res.status(StatusCodes.OK).json({ processor });
+  postData(processor, 'update', UseID.userId);
 };
 
 const deleteProcessor = async (req: Request, res: Response) => {
   const { id: processorId } = req.params;
-
+  const UseID = req.body.UseID;
   const processor = await Processor.findOne({ _id: processorId });
   if (!processor) {
     throw new CustomError.NotFoundError(`No processor with id ${processor}`);
@@ -255,6 +262,7 @@ const deleteProcessor = async (req: Request, res: Response) => {
     remove(processor.images);
   }
   res.status(StatusCodes.OK).json({ msg: 'Success! Processor removed.' });
+  postData(processorId, 'delete', UseID.userId);
 };
 
 const uploadImages = async (req: Request, res: Response) => {

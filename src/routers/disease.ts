@@ -19,6 +19,7 @@ router
   .route('/')
   .get(getAllDiseases)
   .post([authenticateUser, authorizePermissions('admin')], createDisease);
+
 router
   .route('/upload/:id')
   .patch(

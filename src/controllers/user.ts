@@ -42,6 +42,7 @@ const getSingleUser = async (req: Request, res: Response) => {
   // @ts-ignore
   checkPermission(req.user, user._id);
   res.status(StatusCodes.OK).json({ user });
+  console.log('getSingleUser', user);
 };
 const showCurrentUser = async (req: Request, res: Response) => {
   // @ts-ignore
