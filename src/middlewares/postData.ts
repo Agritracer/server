@@ -16,7 +16,8 @@ const postData = async (dataChange: any, status: string, userID: any) => {
     },
   };
   const JsonData = JSON.stringify(data);
-  console.log(JsonData);
+
+
   const url = `${process.env.API_URL_DOMAIN}/api/submit`;
   const response = await fetch(url, {
     method: 'POST',
