@@ -6,7 +6,7 @@ import express from 'express';
 
 const router = express.Router();
 
-router.route('/').get(getAllTraceabilityInfos);
+// router.route('/').get(getAllTraceabilityInfos);
 router.route('/:id').get(getTraceabilityInfo);
 
 export default router;
